@@ -1,6 +1,12 @@
 # run-any-code README
 
-This is the README for your extension "run-any-code". After writing up a brief description, we recommend including the following sections.
+Run pre-configured commands outside VSCode on files or folders from the file explorer.
+
+Install
+run-any-code-0.0.1.vsix
+Ctrl + Shift + P
+Extensions: Install from VSIX
+
 
 ## Features
 
