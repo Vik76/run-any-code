@@ -1,25 +1,50 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
+import cp from "child_process";
+import path from "path";
+import fs from "fs";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  let disposableOpen = vscode.commands.registerCommand(
+    "run.run_command",
+    (file) => {
+      let directoryPath;
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "run-any-code" is now active!');
+      // Проверяем, является ли file.fsPath директорией
+      if (fs.lstatSync(file.fsPath).isDirectory()) {
+        // Если это директория, используем ее как есть
+        directoryPath = file.fsPath;
+      } else {
+        // Если это файл, получаем его директорию
+        directoryPath = path.dirname(file.fsPath);
+      }
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('run-any-code.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Run any code!');
-	});
+      // Получаем команду из настроек
+      const config = vscode.workspace.getConfiguration("runCommand");
+      const commandTemplate = config.get(
+        "command",
+        'xfce4-terminal --working-directory="${directoryPath}" -e mc'
+      );
 
-	context.subscriptions.push(disposable);
+      // Подставляем путь к директории в команду
+      const command = commandTemplate.replace(
+        "${directoryPath}",
+        directoryPath
+      );
+
+      // Запускаем команду
+      cp.exec(command, (err, stdout, stderr) => {
+        if (err) {
+          console.error(`Ошибка при запуске команды: ${stderr}`);
+          return;
+        }
+        console.log(`Команда запущена: ${stdout}`);
+      });
+    }
+  );
+
+  context.subscriptions.push(disposableOpen);
 }
 
 // This method is called when your extension is deactivated

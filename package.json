@@ -12,12 +12,31 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "runCommand.command": {
+          "type": "string",
+          "default": "xfce4-terminal --working-directory=\"${directoryPath}\" -e mc",
+          "description": "Команда для запуска терминала с Midnight Commander для выбранного пути"
+        }
+      }
+    },
     "commands": [
       {
-        "command": "run-any-code.helloWorld",
-        "title": "Hello World"
+        "command": "run.run_command",
+        "title": "Open in Midnight Commander"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "run.run_command",
+          "when": "resourceLangId != markdown",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
